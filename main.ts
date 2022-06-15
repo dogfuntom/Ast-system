@@ -43,19 +43,26 @@ for (let i = 0; i < n; i++) {
 
 const interpreter = new LineInterpreter(d)
 const lines = interpreter.interpret(current)
-Deno.writeTextFileSync("turtle.svg", lines2svg(lines));
+Deno.writeTextFileSync("abop.svg", lines2svg(lines));
 
 function lines2svg (lines : Lines) : string {
     const bounds = lines.reduce<readonly [Point, Point]>(
-        (prev, curr) => [
-            [Math.min(prev[0][0], curr[0][0]), Math.min(prev[0][1], curr[0][1])],
-            [Math.max(prev[1][0], curr[1][0]), Math.max(prev[1][1], curr[1][1])]
-        ],
+        (prev, curr) => {
+            const minX = Math.min(curr[0][0], curr[1][0])
+            const minY = Math.min(curr[0][1], curr[1][1])
+            const maxX = Math.max(curr[0][0], curr[1][0])
+            const maxY = Math.max(curr[0][1], curr[1][1])
+
+            return [
+                [Math.min(prev[0][0], minX), Math.min(prev[0][1], minY)],
+                [Math.max(prev[1][0], maxX), Math.max(prev[1][1], maxY)]
+            ]
+        },
         [[Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER], [Number.MIN_SAFE_INTEGER, Number.MIN_SAFE_INTEGER]]
     )
     const viewBox = [
         Math.floor(bounds[0][0]), Math.floor(bounds[0][1]),
-        Math.ceil(bounds[1][0] - bounds[0][0]), Math.ceil(bounds[1][1] - bounds[0][1])
+        Math.floor(bounds[1][0] - bounds[0][0] + 1), Math.floor(bounds[1][1] - bounds[0][1] + 1)
     ]
 
     const result: Array<string> = []
