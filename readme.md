@@ -8,7 +8,7 @@ Implementing an L-system in an unusual way:
 
 ## Output
 
-<div style="background-color: white"><img src="abop.svg" width="512" height="512"></div>
+<img src="abop.svg" width="512" height="512">
 
 ## Running
 

@@ -1,10 +1,10 @@
-import { Rule } from "./globals.ts";
+import { Production } from "./globals.ts";
 import { Step, Block, Stmt, Turn, Visitor, Noop } from "./statements.ts";
 
-export class ReplaceByRulesTransformer implements Visitor<ReadonlyArray<Stmt>> {
-  rules: readonly Rule[];
+export class ProductionsTransformer implements Visitor<ReadonlyArray<Stmt>> {
+  rules: readonly Production[];
 
-  constructor(rules: ReadonlyArray<Rule>) {
+  constructor(rules: ReadonlyArray<Production>) {
     this.rules = rules;
   }
 
@@ -22,13 +22,13 @@ export class ReplaceByRulesTransformer implements Visitor<ReadonlyArray<Stmt>> {
     )];
   }
 
-  visitDrawStmt(stmt: Step): ReadonlyArray<Stmt> {
+  visitStepStmt(stmt: Step): ReadonlyArray<Stmt> {
     return this.applyFirstMatchingRuleTo(stmt);
   }
 
   applyFirstMatchingRuleTo(stmt: Stmt): ReadonlyArray<Stmt> {
-    const rule = this.rules.filter(r => r[0] === stmt)[0];
-    return rule ? rule[1] : [stmt];
+    const rule = this.rules.filter(r => r.predecessor(stmt))[0];
+    return rule ? rule.successor(stmt) : [stmt];
   }
 
   transform (statements: ReadonlyArray<Stmt>): ReadonlyArray<Stmt> {

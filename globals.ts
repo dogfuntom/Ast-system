@@ -7,4 +7,9 @@ export type Point = readonly [number, number]
 export type Line = readonly [Point, Point]
 export type Lines = ReadonlyArray<Line>
 
-export type Rule = readonly [Stmt, ReadonlyArray<Stmt>]
+// export type Rule = readonly [Stmt, ReadonlyArray<Stmt>]
+
+export interface Production {
+    predecessor: (stmt: Stmt) => boolean,
+    successor: (stmt: Stmt) => ReadonlyArray<Stmt>
+}

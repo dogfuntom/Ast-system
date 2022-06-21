@@ -1,5 +1,5 @@
 import { deg2rad, Line, Lines } from "./globals.ts";
-import { Step, Block, Stmt, Turn, Visitor, Noop } from "./statements.ts";
+import { Block, Noop, Step, Stmt, Turn, Visitor } from "./statements.ts";
 import { Turtle } from "./Turtle.ts";
 
 export class LineInterpreter implements Visitor<Lines> {
@@ -8,54 +8,54 @@ export class LineInterpreter implements Visitor<Lines> {
   stack: Array<Turtle>;
 
   constructor(degreesStep: number, moveStep = 1) {
-    this.stack = []
-    this.turtle = new Turtle(degreesStep * deg2rad, moveStep)
+    this.stack = [];
+    this.turtle = new Turtle(degreesStep * deg2rad, moveStep);
   }
 
   visitBlockStmt(stmt: Block): Lines {
-    this.stack.push(this.turtle)
+    this.stack.push(this.turtle);
 
-    this.turtle = this.turtle.clone()
+    this.turtle = this.turtle.clone();
 
-    const lines = this.interpret(stmt.statements)
+    const lines = this.interpret(stmt.statements);
 
-    const popped = this.stack.pop()
+    const popped = this.stack.pop();
     if (popped) {
-      this.turtle = popped
+      this.turtle = popped;
     } else {
-      throw new Error("Tried to pop from empty stack.")
+      throw new Error("Tried to pop from empty stack.");
     }
 
-    return lines
+    return lines;
   }
 
-  visitDrawStmt(stmt: Step): Lines {
-    const from = this.turtle.currentPosition
-    this.turtle.step();
-    const to = this.turtle.currentPosition
+  visitStepStmt(stmt: Step): Lines {
+    const from = this.turtle.currentPosition;
+    this.turtle.step(stmt.length);
+    const to = this.turtle.currentPosition;
 
-    return stmt.draw ? [[from, to]] : []
+    return stmt.draw ? [[from, to]] : [];
   }
 
-  visitTurnStatement (stmt: Turn): Lines {
+  visitTurnStatement(stmt: Turn): Lines {
     if (stmt.ccw) {
-      this.turtle.turnCCW()
+      this.turtle.turnCCW();
     } else {
-      this.turtle.turnCW()
+      this.turtle.turnCW();
     }
-    return []
+    return [];
   }
 
-  visitNoopStatement (_stmt: Noop): Lines {
-    return []
+  visitNoopStatement(_stmt: Noop): Lines {
+    return [];
   }
 
   interpret(statements: ReadonlyArray<Stmt>): Lines {
-    const result: Array<Line> = []
-    for(const statement of statements) {
-      result.push(...this.execute(statement))
+    const result: Array<Line> = [];
+    for (const statement of statements) {
+      result.push(...this.execute(statement));
     }
-    return result
+    return result;
   }
 
   execute(stmt: Stmt): Lines {
